@@ -9,7 +9,7 @@ package josereyes_labextra;
  *
  * @author josec
  */
-public class JoseReyes_LabExtra {
+public class Main {
 
     /**
      * @param args the command line arguments
