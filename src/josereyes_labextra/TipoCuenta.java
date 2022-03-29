@@ -9,6 +9,15 @@ package josereyes_labextra;
  *
  * @author josec
  */
-public class TipoCuenta {
+public enum TipoCuenta {
+    NORMAL(0.02,500),PLANILLA(0,200),VIP(0.04,1000);
+    public double tasaInteres;
+    public double minisaldo;
+
+    private TipoCuenta(double tasaInteres, double minisaldo) {
+        this.tasaInteres = tasaInteres;
+        this.minisaldo = minisaldo;
+    }
+    
     
 }
