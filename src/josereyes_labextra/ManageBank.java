@@ -7,6 +7,7 @@ package josereyes_labextra;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Calendar;
@@ -62,6 +63,74 @@ public class ManageBank {
         }
     }
     
+    public boolean deposito(int cod,double monto)throws IOException{
+        long x=buscar(cod);
+        if(x!=1){
+            cuentas.readUTF();
+            cuentas.skipBytes(8);
+            double SaldoActual=cuentas.readDouble();
+            cuentas.seek(x);
+            cuentas.readUTF();
+            cuentas.writeLong(Calendar.getInstance().getTimeInMillis());
+            cuentas.writeDouble(SaldoActual+monto);
+            return true;
+        }else{
+            System.out.println("La Cuenta: "+cod+" no esta registrada");
+        }
+        return false;
+    }
     
+    public boolean retiro(int cod,double monto)throws IOException{
+       long x=buscar(cod);
+        if(x!=1){
+            cuentas.readUTF();
+            cuentas.skipBytes(8);
+            double SaldoActual=cuentas.readDouble();
+            if(SaldoActual>monto){
+            cuentas.seek(x);
+            cuentas.readUTF();
+            cuentas.writeLong(Calendar.getInstance().getTimeInMillis());
+            cuentas.writeDouble(SaldoActual-monto);
+            return true;
+            }else{
+                System.out.println("!!!!La Cuenta no tiene esa cantidad de dinero!!!");
+            }
+        }else{
+            System.out.println("La Cuenta: "+cod+" no esta registrada");
+        }
+        return false;
+    }
+    
+    public void registrarIntereses()throws IOException{
+        cuentas.seek(0);
+        while(cuentas.getFilePointer()<cuentas.length()){
+            cuentas.skipBytes(4);
+            cuentas.readUTF();
+            cuentas.skipBytes(8);
+            long saldo=cuentas.getFilePointer();
+            double Saldo=cuentas.readDouble();
+            TipoCuenta tipo=TipoCuenta.valueOf(cuentas.readUTF());
+            double interes=tipo.tasaInteres*Saldo;
+            cuentas.seek(saldo);
+            cuentas.writeDouble(Saldo+interes);
+            cuentas.readUTF();
+        }
+        
+        
+    }
+    
+    public void Import(String filename)throws IOException{
+        FileWriter fw=new FileWriter(filename);
+        cuentas.seek(0);
+        while(cuentas.getFilePointer()<cuentas.length()){
+            int codigo=cuentas.readInt();
+            String nombre=cuentas.readUTF();
+            cuentas.skipBytes(8);
+            double saldo=cuentas.readDouble();
+            String tipo=cuentas.readUTF();
+            fw.write(codigo+"\n"+nombre+"\n"+"Lps."+saldo+"/n"+"Tipo:"+tipo+"\n");
+            fw.flush();
+        }
+    }
     
 }
